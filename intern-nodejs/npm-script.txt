@@ -1,0 +1,6 @@
+npm install
+npm install packagename
+
+development dependencies: --save-dev
+production dependencies: --save
+global dependencies: -g
