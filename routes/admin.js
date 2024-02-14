@@ -1,24 +1,31 @@
-const path = require('path');
+// Import Directory
+const path = require("path");
 
-const express = require('express');
+// Import Express
+const express = require("express");
 
-const adminController = require('../controllers/admin');
+// Import Admin Controller
+const adminController = require("../controllers/admin");
 
+// Create a new Routes
 const router = express.Router();
 
-// /admin/add-product => GET
-router.get('/add-product', adminController.getAddProduct);
+// HTTP - ADMIN ADD PRODUCT PAGE (ADMIN)
+router.get("/admin/add-product", adminController.getAddProduct);
 
-// /admin/products => GET
-router.get('/products', adminController.getProducts);
+// HTTP - ADMIN PRODUCT PAGE (ADMIN)
+router.get("/admin/products", adminController.getProducts);
 
-// /admin/add-product => POST
-router.post('/add-product', adminController.postAddProduct);
+// HTTP - ADMIN AFTER ADD PRODUCT (ADMIN)
+router.post("/admin/add-product", adminController.postAddProduct);
 
-router.get('/edit-product/:productId', adminController.getEditProduct);
+// HTTP - ADMIN EDIT PRODUCT PAGE (ADMIN)
+router.get("/admin/edit-product/:productId", adminController.getEditProduct);
 
-router.post('/edit-product', adminController.postEditProduct);
+// HTTP - ADMIN AFTER EDIT PRODUCT (ADMIN)
+router.post("/admin/edit-product", adminController.postEditProduct);
 
-router.post('/delete-product', adminController.postDeleteProduct);
+// HTTP - ADMIN AFTER DELETE PRODUCT (ADMIN)
+router.post("/admin/delete-product", adminController.postDeleteProduct);
 
 module.exports = router;

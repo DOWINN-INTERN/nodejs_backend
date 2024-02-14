@@ -1,34 +1,41 @@
-const path = require('path');
+// Import Directory
+const path = require("path");
 
-const express = require('express');
-const bodyParser = require('body-parser');
+// Import Express
+const express = require("express");
 
-const errorController = require('./controllers/error');
-const db = require('./util/database');
+// Import BodyParser
+const bodyParser = require("body-parser");
 
+// Import 404 Controller
+const errorController = require("./controllers/error");
+
+// Import UTIL DB Connector
+const sequelize = require('./util/database');
+
+// Initialize View Template
 const app = express();
+app.set("view engine", "ejs");
+app.set("views", "views");
 
+// Set Page Routes (Controller)
+const adminRoutes = require("./routes/admin");
+const shopRoutes = require("./routes/shop");
 
-app.set('view engine', 'ejs');
-app.set('views', 'views');
-
-const adminRoutes = require('./routes/admin');
-const shopRoutes = require('./routes/shop');
-
-db.execute('SELECT * FROM products')
-  .then(result => {
-    console.log(result);
-  })
-  .catch(err => {
-    console.log(err);
-  });
-
+// HTTP Request Parser (Middleware)
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/admin', adminRoutes);
+app.use(express.static(path.join(__dirname, "public")));
+app.use(adminRoutes);
 app.use(shopRoutes);
-
 app.use(errorController.get404);
 
-app.listen(3000);
+// RUN APP
+sequelize
+    .sync()
+    .then((result) => {
+        console.log(result);
+        app.listen(3000);
+    })
+    .catch((err) => {
+        console.log(err);
+    });
