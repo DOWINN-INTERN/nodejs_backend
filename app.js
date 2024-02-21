@@ -1,39 +1,39 @@
 // PATH
-const path = require('path');
+const path = require("path");
 
 // EXPRESS JS
-const express = require('express');
+const express = require("express");
 
 // CONTENT PARSER
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 
 // OBJECT DATA MODELING LIBRARY OF MONGODB
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 // EXPRESS SESSION
-const session = require('express-session');
+const session = require("express-session");
 
 // MONGODB SESSION
-const MongoDBStore = require('connect-mongodb-session')(session);
+const MongoDBStore = require("connect-mongodb-session")(session);
 
 // CSRF TOKEN
-const csrf = require('csurf');
+const csrf = require("csurf");
 
 // MESSAGE FLASHER
-const flash = require('connect-flash');
+const flash = require("connect-flash");
 
 // USED FOR UPLOADING FILES
-const multer = require('multer');
+const multer = require("multer");
 
 // IMPORT ERROR CONTROLLER
-const errorController = require('./controllers/error');
+const errorController = require("./controllers/error");
 
 // IMPORT USER SCHEMA DB/TABLE
-const User = require('./models/user');
+const User = require("./models/user");
 
 // MONGODB CONNECTION STRING
 const MONGODB_URI =
-  'mongodb+srv://edwincalmajr:12345@cluster.ymb6tkc.mongodb.net/shop';
+  "mongodb+srv://edwincalmajr:12345@cluster.ymb6tkc.mongodb.net/shop";
 
 // EXPRESS JS OBJECT
 const app = express();
@@ -41,7 +41,7 @@ const app = express();
 // SESSION OBJECT
 const store = new MongoDBStore({
   uri: MONGODB_URI,
-  collection: 'sessions'
+  collection: "sessions",
 });
 
 // CSRF TOKEN OBJECT
@@ -50,19 +50,22 @@ const csrfProtection = csrf();
 // FILE UPLOAD FOLDER
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'images');
+    cb(null, "images");
   },
   filename: (req, file, cb) => {
-    cb(null, new Date().toISOString() + '-' + file.originalname);
-  }
+    cb(
+      null,
+      new Date().toISOString().replace(/:/g, "-") + "-" + file.originalname,
+    );
+  },
 });
 
 // FILE UPLOAD FILTER
 const fileFilter = (req, file, cb) => {
   if (
-    file.mimetype === 'image/png' ||
-    file.mimetype === 'image/jpg' ||
-    file.mimetype === 'image/jpeg'
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
   ) {
     cb(null, true);
   } else {
@@ -71,36 +74,36 @@ const fileFilter = (req, file, cb) => {
 };
 
 // VIEW TEMPLATES
-app.set('view engine', 'ejs');
-app.set('views', 'views');
+app.set("view engine", "ejs");
+app.set("views", "views");
 
 // IMPORT ROUTES
-const adminRoutes = require('./routes/admin');
-const shopRoutes = require('./routes/shop');
-const authRoutes = require('./routes/auth');
+const adminRoutes = require("./routes/admin");
+const shopRoutes = require("./routes/shop");
+const authRoutes = require("./routes/auth");
 
 // CONTENT PARSER
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // FILE UPLOAD
 app.use(
-  multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image"),
 );
 
-// VIEW TEMPLATES 
-app.use(express.static(path.join(__dirname, 'public')));
+// VIEW TEMPLATES
+app.use(express.static(path.join(__dirname, "public")));
 
 // STATIC IMAGES
-app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 // CSRF TOKEN SESSION
 app.use(
   session({
-    secret: 'my secret',
+    secret: "my secret",
     resave: false,
     saveUninitialized: false,
-    store: store
-  })
+    store: store,
+  }),
 );
 
 // INIT CSRF
@@ -120,44 +123,44 @@ app.use((req, res, next) => {
     return next();
   }
   User.findById(req.session.user._id)
-    .then(user => {
+    .then((user) => {
       if (!user) {
         return next();
       }
       req.user = user;
       next();
     })
-    .catch(err => {
+    .catch((err) => {
       next(new Error(err));
     });
 });
 
 // INIT ROUTES
-app.use('/admin', adminRoutes);
+app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
 // SERVER SIDE ERROR
-app.get('/500', errorController.get500);
+app.get("/500", errorController.get500);
 
 // CLIENT SIDE ERROR
 app.use(errorController.get404);
 
 // SERVER SIDE ERROR CONTROLLER
 app.use((error, req, res, next) => {
-  res.status(500).render('500', {
-    pageTitle: 'Error!',
-    path: '/500',
-    isAuthenticated: req.session.isLoggedIn
+  res.status(500).render("500", {
+    pageTitle: "Error!",
+    path: "/500",
+    isAuthenticated: req.session.isLoggedIn,
   });
 });
 
 // INITIALIZE DB AND SERVER
 mongoose
   .connect(MONGODB_URI)
-  .then(result => {
+  .then((result) => {
     app.listen(3000);
   })
-  .catch(err => {
+  .catch((err) => {
     console.log(err);
   });
